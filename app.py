@@ -1,8 +1,7 @@
-from flask import Flask, abort, render_template, request, redirect, send_from_directory
+from flask import Flask, abort, render_template, request, redirect, send_from_directory, send_file
 import os
 import csv
 import random
-
 
 app = Flask(__name__)
 
@@ -10,7 +9,7 @@ app = Flask(__name__)
 BASE_DIR = "vc"  # 存放所有图片
 MNIST_DIR = os.path.join(BASE_DIR, "mnist")
 CIFAR_DIR = os.path.join(BASE_DIR, "cifar")
-RESULTS_FILE = "results.csv"  # 存储投票结果
+RESULTS_FILE = os.path.join(os.getcwd(), "results.csv")  # 存储投票结果（完整路径）
 
 
 # 📌 读取所有图片（原始 + 对抗）
@@ -36,11 +35,10 @@ def load_images(dataset_dir):
 
 
 # 📌 载入 MNIST 和 CIFAR 图片
-# Ensure at least 20 sets exist
 mnist_images = load_images(MNIST_DIR)
 cifar_images = load_images(CIFAR_DIR)
 
-# If fewer than 20, pad with empty placeholders
+# 确保至少有 20 组数据
 while len(mnist_images) < 20:
     mnist_images.append({"original": "", "adversarial": []})
 
@@ -48,8 +46,7 @@ while len(cifar_images) < 20:
     cifar_images.append({"original": "", "adversarial": []})
 
 
-
-# 📌 让 Flask 提供 `vc/mnist/` 和 `vc/cifar/` 里的图片
+# 📌 提供 `vc/mnist/` 和 `vc/cifar/` 里的图片
 @app.route("/vc/<dataset>/<method>/<filename>")
 def serve_image(dataset, method, filename):
     folder_path = os.path.join(BASE_DIR, dataset, method)
@@ -62,17 +59,25 @@ def index():
         # 📌 获取用户提交的数据
         data = request.form.to_dict(flat=False)
 
-        # 📌 处理数据，转换为 CSV 格式
-        with open(RESULTS_FILE, "a", newline="") as f:
-            writer = csv.writer(f)
-            for key, values in data.items():
-                writer.writerow([key] + values)  # 直接存储投票数据，不再要求邮箱
+        print("Received Data:", data)  # ✅ 调试信息，查看表单数据是否正确
+
+        try:
+            # 📌 追加写入 CSV 文件
+            with open(RESULTS_FILE, "a", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                for key, values in data.items():
+                    writer.writerow([key] + values)  # 直接存储投票数据
+
+                f.flush()  # ✅ 确保数据立即写入
+                os.fsync(f.fileno())  # ✅ 确保写入磁盘
+
+            print(f"Data successfully written to {RESULTS_FILE}")  # ✅ 确认写入成功
+        except Exception as e:
+            print("Error writing to CSV:", str(e))  # ✅ 调试信息，打印错误
 
         return redirect("/")
 
     return render_template("index.html", mnist_images=mnist_images, cifar_images=cifar_images)
-
-from flask import send_file
 
 
 @app.route("/download")
