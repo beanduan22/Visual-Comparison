@@ -156,7 +156,17 @@
 
         <button type="button" onclick="previousPage()">Previous</button>
         <button type="button" onclick="nextPage()" id="nextButton">Next</button>
-        <button type="submit" class="hidden" id="submitButton">Submit</button>
+        <button type="submit" class="hidden" id="submitButton" onclick="showSubmitMessage()">Submit</button>
+        <p id="submitMessage" class="hidden" style="color: red; font-size: 14px; margin-top: 10px;">
+            Please be patient, Submit may take some time. Do not refresh the page.
+        </p>
+
+        <script>
+            function showSubmitMessage() {
+                document.getElementById("submitMessage").classList.remove("hidden");
+            }
+        </script>
+
     </form>
 </body>
 </html>
