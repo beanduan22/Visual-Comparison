@@ -10,70 +10,110 @@
         .image-container { margin: 10px; text-align: center; }
         img { width: 100px; height: 100px; }
         select, input[type="number"] { width: 50px; }
+        .hidden { display: none; }
+        .progress-bar {
+            width: 50%;
+            background-color: #ddd;
+            margin: 20px auto;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress { height: 100%; width: 0%; background-color: green; transition: width 0.5s; }
     </style>
+    <script>
+        let currentPage = 0;
+        let totalPages = 20;
+
+        function showPage(page) {
+            let sections = document.querySelectorAll(".page");
+            sections.forEach((section, index) => {
+                section.classList.toggle("hidden", index !== page);
+            });
+            document.querySelector(".progress").style.width = ((page + 1) / totalPages * 100) + "%";
+
+            document.getElementById("nextButton").classList.toggle("hidden", page === totalPages - 1);
+            document.getElementById("submitButton").classList.toggle("hidden", page !== totalPages - 1);
+        }
+
+        function nextPage() {
+            let sections = document.querySelectorAll(".page");
+            if (currentPage < sections.length - 1) {
+                if (!validatePage(currentPage)) return; // Prevent skipping without input
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        function validatePage(page) {
+            let inputs = document.querySelectorAll(`.page:nth-child(${page + 1}) select, .page:nth-child(${page + 1}) input`);
+            for (let input of inputs) {
+                if (!input.value) {
+                    alert("Please complete all fields before proceeding.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        window.onload = () => showPage(currentPage);
+    </script>
 </head>
 <body>
-    <h1>Visual Comparison Voting</h1>
+    <h1>Visual Comparison</h1>
+    <p><strong>Important Information:</strong> All methods have been randomized, and participants' votes remain anonymous. Each person is allowed to vote only once. Please take this task seriously, as the test will take approximately 20 minutes.</p>
+    <p><strong>Ranking:</strong> Participants rank the 7 adversarial samples from 1 to 7 (1 = most similar to the original image, 7 = least similar to the original image), ensuring each adversarial sample has a unique number.</p>
+    <p><strong>Scoring:</strong> Participants rate each adversarial sample’s realism on a Four-Box Likert Scale based on its similarity to the original image:</p>
+    <ul>
+        <li>4 - Excellent</li>
+        <li>3 - Good</li>
+        <li>2 - Fair</li>
+        <li>1 - Poor</li>
+    </ul>
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
+
     <form method="POST">
-        
-        <!-- MNIST Image Comparisons -->
-        <h2>MNIST Comparison</h2>
-        {% for img in mnist_images %}
-        <div class="image-row">
-            <div class="image-container">
-                <img src="{{ img.original }}" alt="Original Image">
-                <p>Original</p>
+        {% for page_num in range(20) %}
+        <div class="page hidden">
+            <h2>Comparison Set {{ page_num + 1 }}</h2>
+            <div class="image-row">
+                <div class="image-container">
+                    <img src="{{ mnist_images[page_num].original }}" alt="Original Image">
+                    <p>Original</p>
+                </div>
+                {% for method, adv_img in mnist_images[page_num].adversarial %}
+                <div class="image-container">
+                    <img src="{{ adv_img }}" alt="Adversarial Image">
+                    <p>Method {{ loop.index }}</p>
+                    <label>Ranking:
+                        <input type="number" name="mnist_rank_{{ adv_img }}" min="1" max="7" required>
+                    </label>
+                    <label>Scoring:
+                        <select name="mnist_score_{{ adv_img }}" required>
+                            <option value="" disabled selected>None</option>
+                            <option value="4">4 - Excellent</option>
+                            <option value="3">3 - Good</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                    </label>
+                </div>
+                {% endfor %}
             </div>
-            {% for method, adv_img in img.adversarial %}
-            <div class="image-container">
-                <img src="{{ adv_img }}" alt="Adversarial Image">
-                <p>Method {{ loop.index }}</p> <!-- Hide the actual method names -->
-                <label>Ranking: 
-                    <input type="number" name="mnist_rank_{{ adv_img }}" min="1" max="7" required>
-                </label>
-                <label>Scoring: 
-                    <select name="mnist_score_{{ adv_img }}">
-                        <option value="4">4 - Excellent</option>
-                        <option value="3">3 - Good</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="1">1 - Poor</option>
-                    </select>
-                </label>
-            </div>
-            {% endfor %}
         </div>
         {% endfor %}
-
-        <!-- CIFAR Image Comparisons -->
-        <h2>CIFAR Comparison</h2>
-        {% for img in cifar_images %}
-        <div class="image-row">
-            <div class="image-container">
-                <img src="{{ img.original }}" alt="Original Image">
-                <p>Original</p>
-            </div>
-            {% for method, adv_img in img.adversarial %}
-            <div class="image-container">
-                <img src="{{ adv_img }}" alt="Adversarial Image">
-                <p>Method {{ loop.index }}</p> <!-- Hide the actual method names -->
-                <label>Ranking: 
-                    <input type="number" name="cifar_rank_{{ adv_img }}" min="1" max="7" required>
-                </label>
-                <label>Scoring: 
-                    <select name="cifar_score_{{ adv_img }}">
-                        <option value="4">4 - Excellent</option>
-                        <option value="3">3 - Good</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="1">1 - Poor</option>
-                    </select>
-                </label>
-            </div>
-            {% endfor %}
-        </div>
-        {% endfor %}
-
-        <br>
-        <button type="submit">Submit Vote</button>
+        <button type="button" onclick="previousPage()">Previous</button>
+        <button type="button" onclick="nextPage()" id="nextButton">Next</button>
+        <button type="submit" class="hidden" id="submitButton">Submit</button>
     </form>
 </body>
 </html>

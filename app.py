@@ -36,8 +36,17 @@ def load_images(dataset_dir):
 
 
 # 📌 载入 MNIST 和 CIFAR 图片
+# Ensure at least 20 sets exist
 mnist_images = load_images(MNIST_DIR)
 cifar_images = load_images(CIFAR_DIR)
+
+# If fewer than 20, pad with empty placeholders
+while len(mnist_images) < 20:
+    mnist_images.append({"original": "", "adversarial": []})
+
+while len(cifar_images) < 20:
+    cifar_images.append({"original": "", "adversarial": []})
+
 
 
 # 📌 让 Flask 提供 `vc/mnist/` 和 `vc/cifar/` 里的图片
