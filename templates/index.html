@@ -90,9 +90,9 @@
     </div>
 
     <form method="POST">
-        {% for page_num in range(20) %}
+        {% for page_num in range(10) %}
         <div class="page hidden">
-            <h2>Comparison Set {{ page_num + 1 }}</h2>
+            <h2>MNIST Comparison Set {{ page_num + 1 }}</h2>
             <div class="image-row">
                 <div class="image-container">
                     <img src="{{ mnist_images[page_num].original }}" alt="Original Sample" style="width: 150px; height: 150px;">
@@ -121,6 +121,39 @@
             </div>
         </div>
         {% endfor %}
+
+        {% for page_num in range(10) %}
+        <div class="page hidden">
+            <h2>CIFAR Comparison Set {{ page_num + 1 }}</h2>
+            <div class="image-row">
+                <div class="image-container">
+                    <img src="{{ cifar_images[page_num].original }}" alt="Original Sample" style="width: 150px; height: 150px;">
+                    <p>Original Sample</p>
+                </div>
+            </div>
+            <div class="image-row">
+                {% for method, adv_img in cifar_images[page_num].adversarial %}
+                <div class="image-container">
+                    <img src="{{ adv_img }}" alt="Adversarial Sample">
+                    <p>Sample {{ loop.index }}</p>
+                    <label>Rank:
+                        <input type="number" name="cifar_rank_{{ adv_img }}" min="1" max="7" required>
+                    </label>
+                    <label>Score:
+                        <select name="cifar_score_{{ adv_img }}" required>
+                            <option value="" disabled selected>None</option>
+                            <option value="4">4 - Excellent</option>
+                            <option value="3">3 - Good</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
         <button type="button" onclick="previousPage()">Previous</button>
         <button type="button" onclick="nextPage()" id="nextButton">Next</button>
         <button type="submit" class="hidden" id="submitButton">Submit</button>
