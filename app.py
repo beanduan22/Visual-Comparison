@@ -3,6 +3,7 @@ import os
 import csv
 import random
 
+
 app = Flask(__name__)
 
 # 📌 设置图片路径
@@ -62,6 +63,14 @@ def index():
 
     return render_template("index.html", mnist_images=mnist_images, cifar_images=cifar_images)
 
+from flask import send_file
+
+@app.route("/download")
+def download_results():
+    return send_file("results.csv",
+                     as_attachment=True,
+                     mimetype="text/csv",
+                     download_name="voting_results.csv")
 
 if __name__ == "__main__":
     app.run(debug=True)
