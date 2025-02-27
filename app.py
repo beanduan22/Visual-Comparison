@@ -80,7 +80,7 @@ def download_results():
     if not os.path.exists(RESULTS_FILE):
         return abort(404, description="Results file not found.")
 
-    return send_file(RESULTS_FILE, as_attachment=True, mimetype="text/csv", download_name="voting_results.csv")
+    return send_file(RESULTS_FILE, as_attachment=True, mimetype="text/csv", download_name="results.csv")
 
 
 if __name__ == "__main__":
