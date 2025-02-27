@@ -157,28 +157,44 @@
         <button type="button" onclick="previousPage()">Previous</button>
         <button type="button" onclick="nextPage()" id="nextButton">Next</button>
         <button type="submit" class="hidden" id="submitButton" onclick="showSubmitMessage()">Submit</button>
+
         <p id="submitMessage" class="hidden" style="color: red; font-size: 14px; margin-top: 10px;">
-            Please be patient, Submit may take some time. Do not refresh the page.
+            Please be patient, submitting may take some time. Do not refresh the page.
         </p>
+
         <p id="successMessage" class="hidden" style="color: green; font-size: 14px; margin-top: 10px;">
-            Submit successful!
+            Submission successful! Thank you for your participation.
         </p>
 
-        <script>
-            function showSubmitMessage() {
-                let submitMessage = document.getElementById("submitMessage");
-                let successMessage = document.getElementById("successMessage");
+    <script>
+        function showSubmitMessage() {
+            let submitMessage = document.getElementById("submitMessage");
+            let successMessage = document.getElementById("successMessage");
+            let form = document.querySelector("form");
+            let submitButton = document.getElementById("submitButton");
 
-                // 显示提交中的提示
-                submitMessage.classList.remove("hidden");
+            // Show "Please wait" message
+            submitMessage.classList.remove("hidden");
 
-                // 模拟提交完成后显示成功消息
-                setTimeout(function() {
-                    submitMessage.classList.add("hidden"); // 隐藏“请耐心等待”消息
-                    successMessage.classList.remove("hidden"); // 显示“提交成功”消息
-                }, 3000); // 假设提交需要 3 秒
-            }
-        </script>
+            // Disable form inputs to prevent multiple submissions
+            let inputs = form.querySelectorAll("input, select, button");
+            inputs.forEach(input => input.disabled = true);
+
+            // Prevent form from redirecting
+            event.preventDefault();
+
+            // Simulate form submission (replace with actual AJAX if needed)
+            setTimeout(function() {
+                submitMessage.classList.add("hidden"); // Hide waiting message
+                successMessage.classList.remove("hidden"); // Show success message
+
+                // Optionally hide the form after submission
+                form.style.display = "none";
+
+            }, 3000); // Assume submission takes 3 seconds
+        }
+    </script>
+
 
     </form>
 </body>

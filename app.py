@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_from_directory
+from flask import Flask, abort, render_template, request, redirect, send_from_directory
 import os
 import csv
 import random
@@ -74,12 +74,14 @@ def index():
 
 from flask import send_file
 
+
 @app.route("/download")
 def download_results():
-    return send_file("results.csv",
-                     as_attachment=True,
-                     mimetype="text/csv",
-                     download_name="voting_results.csv")
+    if not os.path.exists(RESULTS_FILE):
+        return abort(404, description="Results file not found.")
+
+    return send_file(RESULTS_FILE, as_attachment=True, mimetype="text/csv", download_name="voting_results.csv")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
