@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Comparison Voting</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .image-row { display: flex; justify-content: center; align-items: center; margin: 20px 0; }
+        .image-container { margin: 10px; text-align: center; }
+        img { width: 100px; height: 100px; }
+        select, input[type="number"] { width: 50px; }
+    </style>
+</head>
+<body>
+    <h1>Visual Comparison Voting</h1>
+    <form method="POST">
+        
+        <!-- MNIST Image Comparisons -->
+        <h2>MNIST Comparison</h2>
+        {% for img in mnist_images %}
+        <div class="image-row">
+            <div class="image-container">
+                <img src="{{ img.original }}" alt="Original Image">
+                <p>Original</p>
+            </div>
+            {% for method, adv_img in img.adversarial %}
+            <div class="image-container">
+                <img src="{{ adv_img }}" alt="Adversarial Image">
+                <p>Method {{ loop.index }}</p> <!-- Hide the actual method names -->
+                <label>Ranking: 
+                    <input type="number" name="mnist_rank_{{ adv_img }}" min="1" max="7" required>
+                </label>
+                <label>Scoring: 
+                    <select name="mnist_score_{{ adv_img }}">
+                        <option value="4">4 - Excellent</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                    </select>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <!-- CIFAR Image Comparisons -->
+        <h2>CIFAR Comparison</h2>
+        {% for img in cifar_images %}
+        <div class="image-row">
+            <div class="image-container">
+                <img src="{{ img.original }}" alt="Original Image">
+                <p>Original</p>
+            </div>
+            {% for method, adv_img in img.adversarial %}
+            <div class="image-container">
+                <img src="{{ adv_img }}" alt="Adversarial Image">
+                <p>Method {{ loop.index }}</p> <!-- Hide the actual method names -->
+                <label>Ranking: 
+                    <input type="number" name="cifar_rank_{{ adv_img }}" min="1" max="7" required>
+                </label>
+                <label>Scoring: 
+                    <select name="cifar_score_{{ adv_img }}">
+                        <option value="4">4 - Excellent</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                    </select>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <br>
+        <button type="submit">Submit Vote</button>
+    </form>
+</body>
+</html>
