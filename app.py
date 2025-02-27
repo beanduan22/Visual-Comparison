@@ -9,8 +9,7 @@ app = Flask(__name__)
 BASE_DIR = "vc"  # 存放所有图片
 MNIST_DIR = os.path.join(BASE_DIR, "mnist")
 CIFAR_DIR = os.path.join(BASE_DIR, "cifar")
-RESULTS_FILE = "results.csv"
-EMAILS_FILE = "emails.txt"  # 存储已提交的邮箱，防止重复提交
+RESULTS_FILE = "results.csv"  # 存储投票结果
 
 
 # 📌 读取所有图片（原始 + 对抗）
@@ -50,22 +49,6 @@ def serve_image(dataset, method, filename):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        # 📌 获取邮箱
-        email = request.form.get("email").strip()
-        if not email:
-            return "❌ 请输入邮箱！", 400  # 前端必须填写邮箱
-
-        # 📌 检查是否已提交过
-        if os.path.exists(EMAILS_FILE):
-            with open(EMAILS_FILE, "r") as f:
-                emails = f.read().splitlines()
-                if email in emails:
-                    return "❌ 你已经提交过投票！", 400
-
-        # 📌 记录邮箱，防止重复提交
-        with open(EMAILS_FILE, "a") as f:
-            f.write(email + "\n")
-
         # 📌 获取用户提交的数据
         data = request.form.to_dict(flat=False)
 
@@ -73,7 +56,7 @@ def index():
         with open(RESULTS_FILE, "a", newline="") as f:
             writer = csv.writer(f)
             for key, values in data.items():
-                writer.writerow([email, key] + values)  # 存储邮箱 & 投票数据
+                writer.writerow([key] + values)  # 直接存储投票数据，不再要求邮箱
 
         return redirect("/")
 
