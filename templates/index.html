@@ -37,7 +37,7 @@
         }
 
         function nextPage() {
-            if (!validatePage(currentPage)) return; // Prevent skipping without valid input
+            if (!validatePage(currentPage)) return;
             let sections = document.querySelectorAll(".page");
             if (currentPage < sections.length - 1) {
                 currentPage++;
@@ -73,6 +73,14 @@
                 }
             }
             return true;
+        }
+
+        function showSubmitMessage() {
+            let submitMessage = document.getElementById("submitMessage");
+            let form = document.querySelector("form");
+
+            submitMessage.classList.remove("hidden");
+            form.submit();  // 让表单正常提交
         }
 
         window.onload = () => showPage(currentPage);
@@ -161,41 +169,6 @@
         <p id="submitMessage" class="hidden" style="color: red; font-size: 14px; margin-top: 10px;">
             Please be patient, submitting may take some time. Do not refresh the page.
         </p>
-
-        <p id="successMessage" class="hidden" style="color: green; font-size: 14px; margin-top: 10px;">
-            Submission successful! Thank you for your participation.
-        </p>
-
-    <script>
-        function showSubmitMessage() {
-            let submitMessage = document.getElementById("submitMessage");
-            let successMessage = document.getElementById("successMessage");
-            let form = document.querySelector("form");
-            let submitButton = document.getElementById("submitButton");
-
-            // Show "Please wait" message
-            submitMessage.classList.remove("hidden");
-
-            // Disable form inputs to prevent multiple submissions
-            let inputs = form.querySelectorAll("input, select, button");
-            inputs.forEach(input => input.disabled = true);
-
-            // Prevent form from redirecting
-            event.preventDefault();
-
-            // Simulate form submission (replace with actual AJAX if needed)
-            setTimeout(function() {
-                submitMessage.classList.add("hidden"); // Hide waiting message
-                successMessage.classList.remove("hidden"); // Show success message
-
-                // Optionally hide the form after submission
-                form.style.display = "none";
-
-            }, 3000); // Assume submission takes 3 seconds
-        }
-    </script>
-
-
     </form>
 </body>
 </html>
