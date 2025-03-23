@@ -8,9 +8,6 @@ you can find in
 OpenCV-Testing/API_info.py
 ```
 
-# comfirmed Bugs
-Due to the anonymous review, we cannot put the github link here, but we will open it after review!
-
 # Docker and OpenCV Coverage Setup
 
 Follow these steps to build and run a Docker container for OpenCV code coverage testing, and generate a coverage report.
